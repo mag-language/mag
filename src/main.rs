@@ -6,6 +6,8 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
+use colored::*;
+
 use rand::{Rng, thread_rng};
 
 use linefeed::{Interface, Prompter, ReadResult};
@@ -15,7 +17,7 @@ use linefeed::complete::{Completer, Completion};
 use linefeed::inputrc::parse_text;
 use linefeed::terminal::Terminal;
 
-use magc::scanner::Scanner;
+use magc::lexer::Lexer;
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -29,7 +31,7 @@ fn main() -> io::Result<()> {
     println!("");
 
     interface.set_completer(Arc::new(DemoCompleter));
-    interface.set_prompt("demo> ")?;
+    interface.set_prompt(&format!("{} ", "mag>".green().bold()))?;
 
     if let Err(e) = interface.load_history(HISTORY_FILE) {
         if e.kind() == io::ErrorKind::NotFound {
@@ -44,8 +46,8 @@ fn main() -> io::Result<()> {
             interface.add_history_unique(line.clone());
         }
 
-        let mut scanner = Scanner::new(&line);
-        println!("{:#?}", scanner.parse());
+        let mut lexer = Lexer::new(&line);
+        println!("{:#?}", lexer.parse());
     }
 
     println!("Goodbye.");
