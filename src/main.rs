@@ -18,6 +18,7 @@ use linefeed::inputrc::parse_text;
 use linefeed::terminal::Terminal;
 
 use magc::lexer::Lexer;
+use magc::parser::{Parser, TokenBuffer};
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -47,7 +48,13 @@ fn main() -> io::Result<()> {
         }
 
         let mut lexer = Lexer::new(&line);
-        println!("{:#?}", lexer.parse());
+        let tokens = lexer.parse();
+        println!("{:#?}", &tokens);
+
+        let mut token_buffer = TokenBuffer::new(tokens.clone());
+        let mut parser       = Parser::new(tokens);
+
+        println!("{:#?}", parser.parse_expression(&mut token_buffer));
     }
 
     println!("Goodbye.");
