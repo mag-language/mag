@@ -18,7 +18,7 @@ use linefeed::inputrc::parse_text;
 use linefeed::terminal::Terminal;
 
 use magc::lexer::Lexer;
-use magc::parser::{Parser, TokenBuffer};
+use magc::parser::{Parser, ParserError, TokenBuffer};
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -54,7 +54,16 @@ fn main() -> io::Result<()> {
         let mut token_buffer = TokenBuffer::new(tokens.clone());
         let mut parser       = Parser::new(tokens);
 
-        println!("{:#?}", parser.parse_expression(&mut token_buffer));
+        match parser.parse_expression() {
+            Ok(expr) => println!("{:#?}", expr),
+            Err(e)   => {
+                match e {
+                    ParserError::MissingPrefixParselet => {
+                        println!("{} {}", "error:".bright_red().bold(), "cannot find a prefix parselet for this token type".bold())
+                    },
+                }
+            },
+        }
     }
 
     println!("Goodbye.");
