@@ -9,4 +9,4 @@ edition = "2021"
 colored = "2.0.0"
 linefeed = "0.6.0"
 rand = "0.8.5"
-magc = { path = "../magpiec" }
+magc = { path = "../magc" }
