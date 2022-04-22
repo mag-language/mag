@@ -18,7 +18,7 @@ use linefeed::inputrc::parse_text;
 use linefeed::terminal::Terminal;
 
 use magc::lexer::Lexer;
-use magc::parser::{Parser, ParserError, TokenBuffer};
+use magc::parser::{Parser, ParserError};
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -51,15 +51,26 @@ fn main() -> io::Result<()> {
         let tokens = lexer.parse();
         println!("{:#?}", &tokens);
 
-        let mut token_buffer = TokenBuffer::new(tokens.clone());
-        let mut parser       = Parser::new(tokens);
+        let mut parser = Parser::new(tokens);
 
-        match parser.parse_expression() {
-            Ok(expr) => println!("{:#?}", expr),
+        match parser.parse() {
+            Ok(res) => println!("{:#?}", res),
             Err(e)   => {
                 match e {
-                    ParserError::MissingPrefixParselet => {
-                        println!("{} {}", "error:".bright_red().bold(), "cannot find a prefix parselet for this token type".bold())
+                    ParserError::MissingPrefixParselet(token_kind) => {
+                        println!("{} {} {}", "error:".bright_red().bold(), "cannot find a prefix parselet for".bold(), format!("{:?}", token_kind).bold());
+                    },
+
+                    ParserError::UnexpectedEOF => {
+                        println!("{} {}", "error:".bright_red().bold(), "unexpected EOF".bold())
+                    },
+
+                    ParserError::UnexpectedToken { expected, found } => {
+                        println!("{} {}", "error:".bright_red().bold(), format!("expected token {:?}, found {:?}", expected, found).bold())
+                    },
+
+                    ParserError::UnexpectedExpression { expected, found } => {
+                        println!("{} {}", "error:".bright_red().bold(), format!("expected expression {:?}, found {:#?}", expected, found).bold())
                     },
                 }
             },
