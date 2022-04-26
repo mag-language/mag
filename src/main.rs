@@ -9,6 +9,9 @@ use std::time::Duration;
 use colored::*;
 
 use rand::{Rng, thread_rng};
+use clap::Parser as ClapParser;
+use std::fs::File;
+use std::io::prelude::*;
 
 use linefeed::{Interface, Prompter, ReadResult};
 use linefeed::chars::escape_sequence;
@@ -22,6 +25,18 @@ use magc::parser::{Parser, ParserError};
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
+/// Simple program to greet a person
+#[derive(ClapParser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// A path to a file which contains Mag code.
+    path: Option<String>,
+
+    /// Number of times to greet
+    #[clap(short, long, default_value_t = 1)]
+    count: u8,
+}
+
 fn main() -> io::Result<()> {
     let interface = Arc::new(Interface::new("demo")?);
     let mut thread_id = 0;
@@ -31,23 +46,14 @@ fn main() -> io::Result<()> {
     println!("Press Ctrl-D or enter \"quit\" to exit.");
     println!("");
 
-    interface.set_completer(Arc::new(DemoCompleter));
-    interface.set_prompt(&format!("{} ", "mag>".green().bold()))?;
+    let args = Args::parse();
 
-    if let Err(e) = interface.load_history(HISTORY_FILE) {
-        if e.kind() == io::ErrorKind::NotFound {
-            println!("History file {} doesn't exist, not loading history.", HISTORY_FILE);
-        } else {
-            eprintln!("Could not load history file {}: {}", HISTORY_FILE, e);
-        }
-    }
+    if let Some(path) = args.path {
+        let mut file = File::open(path)?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
 
-    while let ReadResult::Input(line) = interface.read_line()? {
-        if !line.trim().is_empty() {
-            interface.add_history_unique(line.clone());
-        }
-
-        let mut lexer = Lexer::new(&line);
+        let mut lexer = Lexer::new(&contents);
         let tokens = lexer.parse();
         println!("{:#?}", &tokens);
 
@@ -75,9 +81,55 @@ fn main() -> io::Result<()> {
                 }
             },
         }
-    }
+    } else {
+        interface.set_completer(Arc::new(DemoCompleter));
+        interface.set_prompt(&format!("{} ", "mag>".green().bold()))?;
 
-    println!("Goodbye.");
+        if let Err(e) = interface.load_history(HISTORY_FILE) {
+            if e.kind() == io::ErrorKind::NotFound {
+                println!("History file {} doesn't exist, not loading history.", HISTORY_FILE);
+            } else {
+                eprintln!("Could not load history file {}: {}", HISTORY_FILE, e);
+            }
+        }
+
+        while let ReadResult::Input(line) = interface.read_line()? {
+            if !line.trim().is_empty() {
+                interface.add_history_unique(line.clone());
+            }
+
+            let mut lexer = Lexer::new(&line);
+            let tokens = lexer.parse();
+            println!("{:#?}", &tokens);
+
+            let mut parser = Parser::new(tokens);
+
+            match parser.parse() {
+                Ok(res) => println!("{:#?}", res),
+                Err(e)   => {
+                    match e {
+                        ParserError::MissingPrefixParselet(token_kind) => {
+                            println!("{} {} {}", "error:".bright_red().bold(), "cannot find a prefix parselet for".bold(), format!("{:?}", token_kind).bold());
+                        },
+
+                        ParserError::UnexpectedEOF => {
+                            println!("{} {}", "error:".bright_red().bold(), "unexpected EOF".bold())
+                        },
+
+                        ParserError::UnexpectedToken { expected, found } => {
+                            println!("{} {}", "error:".bright_red().bold(), format!("expected token {:?}, found {:?}", expected, found).bold())
+                        },
+
+                        ParserError::UnexpectedExpression { expected, found } => {
+                            println!("{} {}", "error:".bright_red().bold(), format!("expected expression {:?}, found {:#?}", expected, found).bold())
+                        },
+                    }
+                },
+            }
+        }
+
+        println!("Goodbye.");
+    }
 
     Ok(())
 }
