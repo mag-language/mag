@@ -23,6 +23,10 @@ use linefeed::terminal::Terminal;
 use magc::lexer::Lexer;
 use magc::parser::{Parser, ParserError};
 
+pub mod interpreter;
+
+use self::interpreter::Interpreter;
+
 const HISTORY_FILE: &str = "linefeed.hst";
 
 /// Simple program to greet a person
@@ -99,13 +103,22 @@ fn main() -> io::Result<()> {
             }
 
             let mut lexer = Lexer::new(&line);
+            let mut interpreter = Interpreter::new();
             let tokens = lexer.parse();
-            println!("{:#?}", &tokens);
+            //println!("{:#?}", &tokens);
 
             let mut parser = Parser::new(tokens);
 
             match parser.parse() {
-                Ok(res) => println!("{:#?}", res),
+                Ok(res) => {
+                    //println!("{:#?}", res);
+                    for expr in res {
+                        match interpreter.evaluate(Box::new(expr.clone())) {
+                            Ok(e) => println!("{}", e.lexeme.yellow()),
+                            Err(e) => println!("interpreter error: {:?}", e),
+                        }
+                    }
+                },
                 Err(e)   => {
                     match e {
                         ParserError::MissingPrefixParselet(token_kind) => {
