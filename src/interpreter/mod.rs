@@ -25,7 +25,7 @@ impl Interpreter {
         }
     }
 
-    fn evaluate_infix(&mut self, infix: InfixExpression) -> Result<Box<Expression>, InterpreterError> {
+    fn evaluate_infix(&mut self, infix: Infix) -> Result<Box<Expression>, InterpreterError> {
         let left = self.evaluate(infix.left)?;
         let right = self.evaluate(infix.right)?;
 
