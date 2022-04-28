@@ -20,6 +20,7 @@ impl Interpreter {
         match expr.clone().kind {
             ExpressionKind::Infix(infix) => self.evaluate_infix(infix),
             ExpressionKind::Literal(literal) => Ok(expr),
+            ExpressionKind::Pattern(Pattern::Tuple { expr }) => Ok(self.evaluate(expr)?),
 
             _ => unimplemented!(),
         }
