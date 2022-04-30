@@ -111,7 +111,7 @@ fn main() -> io::Result<()> {
 
             match parser.parse() {
                 Ok(res) => {
-                    //println!("{:#?}", res);
+                    println!("{:#?}", res);
                     for expr in res {
                         match interpreter.evaluate(Box::new(expr.clone())) {
                             Ok(e) => println!("{}", e.lexeme.yellow()),
