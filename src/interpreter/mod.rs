@@ -5,14 +5,17 @@ use colored::*;
 use std::collections::HashMap;
 
 pub struct Interpreter {
-    /// A key-value structure which registers methods that may share a common name.
-    methods: HashMap<String, Multimethod>,
+    /// A global namespace for variables
+    environment: HashMap<String, Box<Expression>>,
+    /// A special data structure which stores and linearizes multimethods.
+    multimethods: HashMap<String, Multimethod>,
 }
 
 impl Interpreter {
     pub fn new() -> Self {
         Self {
-            methods: HashMap::new(),
+            environment: HashMap::new(),
+            multimethods: HashMap::new(),
         }
     }
 
@@ -82,6 +85,8 @@ pub enum InterpreterError {
     UnexpectedType,
 }
 
+/// A method definition that has one name and many pairs of function signatures and bodies.
 pub struct Multimethod {
-    pub methods: Vec<(Pattern, Vec<Expression>)>,
+    /// The individual methods this multimethod is composed of.
+    pub receivers: HashMap<Pattern, Box<Expression>>,
 }
