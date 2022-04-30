@@ -86,6 +86,8 @@ fn main() -> io::Result<()> {
             },
         }
     } else {
+        let mut interpreter = Interpreter::new();
+
         interface.set_completer(Arc::new(DemoCompleter));
         interface.set_prompt(&format!("{} ", "mag>".green().bold()))?;
 
@@ -103,7 +105,6 @@ fn main() -> io::Result<()> {
             }
 
             let mut lexer = Lexer::new(&line);
-            let mut interpreter = Interpreter::new();
             let tokens = lexer.parse();
             //println!("{:#?}", &tokens);
 
