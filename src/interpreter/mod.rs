@@ -80,18 +80,56 @@ impl Interpreter {
         }
     }
 
+    fn expect_pattern_option(&self, option: Option<Box<Expression>>) -> Result<Pattern, InterpreterError> {
+        if let Some(expr) = option {
+            if let ExpressionKind::Pattern(pattern) = expr.kind {
+                return Ok(pattern)
+            }
+        }
+
+        Err(InterpreterError::UnexpectedType)
+    }
+
+
     /// Call an instance of a multimethod.
     fn evaluate_call(&mut self, call: Call) -> Result<Box<Expression>, InterpreterError> {
-        let name = self.expect_variable_pattern(call.method);
+        let name = self.expect_variable_pattern(call.method)?;
 
         println!("methods: {:#?}", self.multimethods);
 
-        Ok(Box::new(Expression {
-            kind: ExpressionKind::Identifier,
-            start_pos: 0,
-            end_pos: 0,
-            lexeme: "_".to_string(),
-        }))
+        if let Some(multimethod) = self.multimethods.get(&name) {
+            let valid_signatures: HashMap<Pattern, Box<Expression>> = multimethod.receivers
+                .into_iter()
+                .filter_map(|(signature, body)| {
+                    let signature = self.expect_pattern(signature).unwrap();
+
+                    if let Some(call_signature) = &call.signature {
+                        if let Ok(does_match) = call_signature.linearize(signature.clone()) {
+                            println!("call.signature.linearize does_match: {:?}", does_match);
+
+                            if does_match {
+                                Some((signature, body))
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            Ok(Box::new(Expression {
+                kind: ExpressionKind::Identifier,
+                start_pos: 0,
+                end_pos: 0,
+                lexeme: "_".to_string(),
+            }))
+        } else {
+            Err(InterpreterError::MethodNotFound)
+        }
     }
 
     fn evaluate_infix(&mut self, infix: Infix) -> Result<Box<Expression>, InterpreterError> {
@@ -145,24 +183,26 @@ impl Interpreter {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum InterpreterError {
     UnexpectedType,
-    /// Cannot add another multimethod with the exact same name and signature.
+    /// There is already another multimethod with the exact same name and signature.
     MethodSignatureExists,
     /// There is no matching signature for the current method call.
     MethodSignatureNotFound,
+    /// There is no multimethod with this name.
+    MethodNotFound,
 }
 
 /// A method definition that has one name and many pairs of function signatures and bodies.
 #[derive(Debug)]
 pub struct Multimethod {
     /// The individual signatures and bodies this multimethod is composed of.
-    pub receivers: HashMap<Box<Expression>, Box<Expression>>,
+    pub receivers: HashMap<Pattern, Expression>,
 }
 
 impl Multimethod {
-    pub fn new(signature: Box<Expression>, body: Box<Expression>) -> Self {
+    pub fn new(signature: Pattern, body: Expression) -> Self {
         let mut receivers = HashMap::new();
 
         receivers.insert(signature, body);
