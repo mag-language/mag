@@ -45,10 +45,9 @@ fn main() -> io::Result<()> {
     let interface = Arc::new(Interface::new("demo")?);
     let mut thread_id = 0;
 
-    println!("This is the linefeed demo program.");
+    println!("Interactive Mag v0.3");
     println!("Enter \"help\" for a list of commands.");
     println!("Press Ctrl-D or enter \"quit\" to exit.");
-    println!("");
 
     let args = Args::parse();
 
