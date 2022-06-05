@@ -8,6 +8,9 @@ edition = "2021"
 [dependencies]
 clap = { version = "3.1.12", features = ["derive"] }
 colored = "2.0.0"
+console = "0.15.0"
+dialoguer = "0.10.1"
+indicatif = "0.16.2"
 linefeed = "0.6.0"
 rand = "0.8.5"
 magc = { path = "../magc" }
