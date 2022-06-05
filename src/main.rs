@@ -23,9 +23,7 @@ use linefeed::terminal::Terminal;
 use magc::lexer::Lexer;
 use magc::parser::{Parser, ParserError};
 
-//pub mod interpreter;
-
-//use self::interpreter::Interpreter;
+use magi::interpreter::Interpreter;
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -85,11 +83,15 @@ fn main() -> io::Result<()> {
                     ParserError::ExpectedPattern => {
                         println!("{} {}", "error:".bright_red().bold(), format!("expected pattern").bold())
                     },
+
+                    ParserError::NoMatch => {
+                        println!("{} {}", "error:".bright_red().bold(), format!("the given pattern doesn't match the reference pattern").bold())
+                    },
                 }
             },
         }
     } else {
-        //let mut interpreter = Interpreter::new();
+        let mut interpreter = Interpreter::new();
 
         interface.set_completer(Arc::new(DemoCompleter));
         interface.set_prompt(&format!("{} ", "mag>".green().bold()))?;
@@ -116,12 +118,13 @@ fn main() -> io::Result<()> {
             match parser.parse() {
                 Ok(res) => {
                     println!("{:#?}", res);
-                    /*for expr in res {
-                        match interpreter.evaluate(Box::new(expr.clone())) {
+
+                    for expr in res {
+                        match interpreter.evaluate(Box::new(expr.clone()), None) {
                             Ok(e) => println!("{}", e.lexeme.yellow()),
-                            Err(e) => println!("interpreter error: {:?}", e),
+                            Err(e) => println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold()),
                         }
-                    }*/
+                    }
                 },
                 Err(e)   => {
                     match e {
@@ -143,6 +146,10 @@ fn main() -> io::Result<()> {
 
                         ParserError::ExpectedPattern => {
                             println!("{} {}", "error:".bright_red().bold(), format!("expected pattern").bold())
+                        },
+
+                        ParserError::NoMatch => {
+                            println!("{} {}", "error:".bright_red().bold(), format!("the given pattern doesn't match the reference pattern").bold())
                         },
                     }
                 },
