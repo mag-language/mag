@@ -24,6 +24,7 @@ use magc::lexer::Lexer;
 use magc::parser::{Parser, ParserError};
 
 use magi::interpreter::Interpreter;
+use magi::types::Obj;
 
 const HISTORY_FILE: &str = "linefeed.hst";
 
@@ -120,8 +121,8 @@ fn main() -> io::Result<()> {
                     println!("{:#?}", res);
 
                     for expr in res {
-                        match interpreter.evaluate(Box::new(expr.clone()), None) {
-                            Ok(e) => println!("{}", e.lexeme.yellow()),
+                        match interpreter.evaluate(Box::new(Obj::from(expr.clone())), None) {
+                            Ok(obj) => println!("{}", format!("{:#?}", obj).yellow()),
                             Err(e) => println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold()),
                         }
                     }
