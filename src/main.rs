@@ -118,11 +118,11 @@ fn main() -> io::Result<()> {
 
             match parser.parse() {
                 Ok(res) => {
-                    println!("{:#?}", res);
+                    //println!("{:#?}", res);
 
                     for expr in res {
                         match interpreter.evaluate(Box::new(Obj::from(expr.clone())), None) {
-                            Ok(obj) => println!("{}", format!("{:#?}", obj).yellow()),
+                            Ok(obj) => println!("{}", format!("{}", obj).yellow()),
                             Err(e) => println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold()),
                         }
                     }
