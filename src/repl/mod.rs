@@ -39,9 +39,17 @@ impl Repl {
 
             self.runtime.lexer.add_text(line);
             let tokens = self.runtime.lexer.parse();
-            let tree = self.runtime.parser.add_tokens(vec![], tokens);
+            let tree = self.runtime.parser.add_tokens(self.runtime.lexer.source.clone(), tokens);
             let result = self.runtime.parser.parse();
-            println!("Parsed: {:?}", result);
+
+            match result {
+                Ok(r) => {
+                    println!("{:#?}", r);
+                },
+                Err(e) => {
+                    println!("{} {:?}", "error:".bright_red().bold(), e);
+                }
+            }
         }
 
         Ok(())
