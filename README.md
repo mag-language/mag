@@ -30,13 +30,13 @@ Patterns are not just used in Rust-like `match` expresions, they are actually di
 
 Enough fuzzy talk, let's start a REPL from the command line to get this project up and running.
 
-For now, please make sure you have `magc` and `strontium` cloned into the same directory as our current runtime, and then run this in the project run to start the REPL:
+Run the following command from the project root to start the REPL:
 
 ```
 cargo run
 ```
 
-Try to enter simple arithmetic expressions like `3 * 7` to see the execution pipeline in action.
+Try to enter simple arithmetic expressions like `1 + 2` or `3 * 7` to see the execution pipeline in action. Expect a lot of bugs for now!
 
 ## Credits
 
