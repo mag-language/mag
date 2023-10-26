@@ -1,8 +1,8 @@
 [package]
 name = "mag_lang"
-description = "An optionally typed, object-oriented programming language with patterns, classes and multimethods."
+description = "The Mag Language Runtime"
 keywords = ["language", "parser", "compiler", "runtime"]
-categories = ["compilers", "development-tools", "parser-implementations", "virtualization"]
+categories = ["compilers", "development-tools", "parser-implementations"]
 license = "MIT"
 version = "0.1.0"
 edition = "2021"
@@ -17,6 +17,5 @@ crossterm = "0.25.0"
 dialoguer = "0.10.1"
 indicatif = "0.16.2"
 rand = "0.8.5"
-magc = { path = "../magc" }
-strontium = { path = "../strontium" }
-# magi = { path = "../magi" }
+magc = "0.1.0"
+strontium = "0.6.0"
