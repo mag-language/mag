@@ -30,9 +30,23 @@ Patterns are not just used in Rust-like `match` expresions, they are actually di
 
 Enough fuzzy talk, let's start a REPL from the command line to get this project up and running.
 
-For now, please make sure you have `magc` and `strontium` cloned into the same directory as our current runtime
+For now, please make sure you have `magc` and `strontium` cloned into the same directory as our current runtime, and then run this in the project run to start the REPL:
 
+```
+cargo run
+```
+
+Try to enter simple arithmetic expressions like `3 * 7` to see the execution pipeline in action.
+
+## Credits
+
+Mag is based on the Magpie language by [Robert Nystrom](http://stuffwithstuff.com/), who is a language engineer at Google with [a blog and a lot of amazing ideas](http://journal.stuffwithstuff.com/category/magpie/). His various blog posts are what started and inspired this project, and I plan on continuing his legacy even if the original codebase ceases further development.
+
+However, since there are a few syntactical differences to the original Magpie language, the two languages are *source-incompatible* and thus have different names. In particular, Bob's implementation substitutes the dot commonly used for calling methods on objects with a space (usually a meaningless character), which I find rather unintuitive, especially for new programmers.
+
+<!--
 # Roadmap
+
 
 - [x] REPL
   - [x] Basic interface for entering commands
@@ -42,11 +56,5 @@ For now, please make sure you have `magc` and `strontium` cloned into the same d
     - [x] Simple error handling
     - [ ] Complex error messages with source code and help
   - [ ] Multi-Line Input
-  - [ ] Subtask 1.2.2
-- [ ] Main Task 2
-  - [ ] Subtask 2.1
-  - [ ] Subtask 2.2
-- [x] Completed Main Task 3
-  - [x] Completed Subtask 3.1
-  - [ ] Subtask 3.2
+-->
 
