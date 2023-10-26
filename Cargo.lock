@@ -420,16 +420,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "magc"
-version = "0.1.0"
-dependencies = [
- "clap",
- "strontium",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "magpie"
+name = "mag_lang"
 version = "0.1.0"
 dependencies = [
  "clap",
@@ -441,6 +432,15 @@ dependencies = [
  "magc",
  "rand",
  "strontium",
+]
+
+[[package]]
+name = "magc"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "strontium",
+ "unicode-segmentation",
 ]
 
 [[package]]
