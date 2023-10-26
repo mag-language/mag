@@ -1,6 +1,7 @@
 [package]
 name = "mag_lang"
 description = "The Mag Language Runtime"
+repository = "https://github.com/mag-language/mag"
 keywords = ["language", "parser", "compiler", "runtime"]
 categories = ["compilers", "development-tools", "parser-implementations"]
 license = "MIT"
