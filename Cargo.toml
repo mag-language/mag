@@ -1,5 +1,9 @@
 [package]
 name = "mag_lang"
+description = "An optionally typed, object-oriented programming language with patterns, classes and multimethods."
+keywords = ["language", "parser", "compiler", "runtime"]
+categories = ["compilers", "development-tools", "parser-implementations", "virtualization"]
+license = "MIT"
 version = "0.1.0"
 edition = "2021"
 
