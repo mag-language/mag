@@ -18,5 +18,5 @@ crossterm = "0.25.0"
 dialoguer = "0.10.1"
 indicatif = "0.16.2"
 rand = "0.8.5"
-magc = "0.1.0"
-strontium = "0.6.0"
+magc = { path = "../magc" }
+strontium = { path = "../strontium" }
