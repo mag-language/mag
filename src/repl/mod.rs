@@ -7,7 +7,7 @@ use std::io::stdout;
 use std::io::Write;
 
 use colored::*;
-use super::runtime::Runtime;
+use crate::runtime::{Runtime, RuntimeConfig};
 
 pub struct Repl {
     runtime: Runtime,
@@ -19,7 +19,7 @@ pub struct Repl {
 impl Repl {
     pub fn new() -> Self {
         Self {
-            runtime: Runtime::new(),
+            runtime: Runtime::new(RuntimeConfig { debug: true }),
             cursor_x: 0,
             _history: vec![],
             _history_y: 0,
@@ -36,25 +36,32 @@ impl Repl {
             print!("{} ", ">>>".green().bold());
             stdout().flush()?;
 
-            let line = self.read_line()?;
+            let line = format!("{}\n", self.read_line()?);
 
             /*self.runtime.lexer.add_text(line);
             let tokens = self.runtime.lexer.parse();
             let _tree = self.runtime.parser.add_tokens(self.runtime.lexer.source.clone(), tokens);
             let result = self.runtime.parser.parse();*/
 
-            let result = self.runtime.compiler.compile(line);
+            let result = self.runtime.compiler.compile(line.clone());
 
             match result {
                 Ok(instructions) => {
-                    // println!("{}\n{:#?}", "instructions:".bright_blue().bold(), instructions);
+                    println!("{}\n{:#?}", "instructions:".bright_blue().bold(), instructions);
 
-                    for instruction in instructions {
-                        self.runtime.machine.execute(instruction).unwrap();
+                    for instruction in instructions.clone() {
+                        self.runtime.machine.push_instruction(instruction);
+                    }
+
+                    if instructions.len() > 0 {
+                        self.runtime.machine.execute().unwrap();
                     }
                 },
                 Err(e) => {
-                    println!("{} {:?}", "error:".bright_red().bold(), e);
+                    println!("{} {}", "error:".bright_red().bold(), format!("{}", e).bold());
+                    println!("{}",       "  |".blue().bold());
+                    println!("{}    {}", "1 |".blue().bold(), line);
+                    println!("{}",       "  |".blue().bold());
                 }
             }
         }
