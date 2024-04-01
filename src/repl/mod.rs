@@ -9,6 +9,9 @@ use std::io::Write;
 use colored::*;
 use crate::runtime::{Runtime, RuntimeConfig};
 
+use strontium::machine::bytecode::BytecodeError;
+use strontium::types::StrontiumError;
+
 pub struct Repl {
     runtime: Runtime,
     cursor_x: usize,
@@ -54,7 +57,19 @@ impl Repl {
                     }
 
                     if instructions.len() > 0 {
-                        self.runtime.machine.execute().unwrap();
+                        match self.runtime.machine.execute_until_eof() {
+                            Ok(res) => println!("{:?}", res),
+                            Err(e) => {
+                                println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold());
+                                match e {
+                                    StrontiumError::BytecodeError(BytecodeError::UnexpectedEof(_)) => {
+                                        println!("{} {:?}", "bytecode:".bright_blue().bold(), self.runtime.machine.registers.get("bc").unwrap());
+                                    },
+
+                                    _ => {},
+                                }
+                            }
+                        }
                     }
                 },
                 Err(e) => {
