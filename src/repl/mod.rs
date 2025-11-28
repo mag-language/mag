@@ -20,9 +20,9 @@ pub struct Repl {
 }
 
 impl Repl {
-    pub fn new() -> Self {
+    pub fn new(debug: bool) -> Self {
         Self {
-            runtime: Runtime::new(RuntimeConfig { debug: true }),
+            runtime: Runtime::new(RuntimeConfig { debug }),
             cursor_x: 0,
             _history: vec![],
             _history_y: 0,
@@ -50,15 +50,18 @@ impl Repl {
 
             match result {
                 Ok(instructions) => {
-                    println!("{}\n{:#?}", "instructions:".bright_blue().bold(), instructions);
+                    if self.runtime.config.debug {
+                        println!("{}\n{:#?}", "instructions:".bright_blue().bold(), instructions);
+                    }
 
+                    self.runtime.machine.reset();
                     for instruction in instructions.clone() {
                         self.runtime.machine.push_instruction(instruction);
                     }
 
                     if instructions.len() > 0 {
                         match self.runtime.machine.execute_until_eof() {
-                            Ok(res) => println!("{:?}", res),
+                            Ok(_) => {},
                             Err(e) => {
                                 println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold());
                                 match e {

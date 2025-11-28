@@ -25,11 +25,11 @@ pub struct Runtime {
 impl Runtime {
     pub fn new(config: RuntimeConfig) -> Self {
         Self {
-            config,
             lexer:  Lexer::new(),
             parser: Parser::new(),
             compiler: Compiler::new(),
-            machine: Strontium::new(),
+            machine: Strontium::new(config.debug),
+            config,
         }
     }
 
