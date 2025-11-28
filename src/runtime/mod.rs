@@ -58,7 +58,7 @@ impl Runtime {
                 let mut bytecode = vec![];
 
                 for expression in expressions {
-                    let mut compiled = self.compiler.compile_expression(expression, None);
+                    let compiled = self.compiler.compile_expression(expression, None);
 
                     match compiled {
                         Ok(mut compiled) => {
