@@ -6,8 +6,8 @@ use crossterm::{
 use std::io::stdout;
 use std::io::Write;
 
-use colored::*;
 use crate::runtime::{Runtime, RuntimeConfig};
+use colored::*;
 
 use strontium::machine::bytecode::BytecodeError;
 use strontium::types::StrontiumError;
@@ -51,35 +51,62 @@ impl Repl {
             match result {
                 Ok(instructions) => {
                     if self.runtime.config.debug {
-                        println!("{}\n{:#?}", "instructions:".bright_blue().bold(), instructions);
+                        println!(
+                            "{}\n{:#?}",
+                            "instructions:".bright_blue().bold(),
+                            instructions
+                        );
                     }
 
                     self.runtime.machine.reset();
+                    self.runtime.machine.multimethod_table.clear();
+                    for reg in &self.runtime.compiler.method_registrations {
+                        self.runtime.machine.register_method(
+                            reg.method_name.clone(),
+                            reg.pattern.clone(),
+                            reg.address,
+                        );
+                    }
+
                     for instruction in instructions.clone() {
                         self.runtime.machine.push_instruction(instruction);
                     }
 
                     if instructions.len() > 0 {
                         match self.runtime.machine.execute_until_eof() {
-                            Ok(_) => {},
+                            Ok(_) => {}
                             Err(e) => {
-                                println!("{} {}", "error:".bright_red().bold(), format!("{:?}", e).bold());
+                                println!(
+                                    "{} {}",
+                                    "error:".bright_red().bold(),
+                                    format!("{:?}", e).bold()
+                                );
                                 match e {
-                                    StrontiumError::BytecodeError(BytecodeError::UnexpectedEof(_)) => {
-                                        println!("{} {:?}", "bytecode:".bright_blue().bold(), self.runtime.machine.registers.get("bc").unwrap());
-                                    },
+                                    StrontiumError::BytecodeError(
+                                        BytecodeError::UnexpectedEof(_),
+                                    ) => {
+                                        println!(
+                                            "{} {:?}",
+                                            "bytecode:".bright_blue().bold(),
+                                            self.runtime.machine.registers.get("bc").unwrap()
+                                        );
+                                    }
 
-                                    _ => {},
+                                    _ => {}
                                 }
                             }
                         }
                     }
-                },
+                }
                 Err(e) => {
-                    println!("{} {}", "error:".bright_red().bold(), format!("{}", e).bold());
-                    println!("{}",       "  |".blue().bold());
+                    println!(
+                        "{} {}",
+                        "error:".bright_red().bold(),
+                        format!("{}", e).bold()
+                    );
+                    println!("{}", "  |".blue().bold());
                     println!("{}    {}", "1 |".blue().bold(), line);
-                    println!("{}",       "  |".blue().bold());
+                    println!("{}", "  |".blue().bold());
                 }
             }
         }
@@ -94,17 +121,17 @@ impl Repl {
             match code {
                 KeyCode::Enter => {
                     break;
-                },
+                }
 
                 KeyCode::Left => {
                     self.cursor_x -= 1;
                     break;
-                },
+                }
 
                 KeyCode::Char(c) => {
                     line.push(c);
                     self.cursor_x += 1;
-                },
+                }
                 _ => {}
             }
         }
