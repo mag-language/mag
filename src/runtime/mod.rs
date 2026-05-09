@@ -1,9 +1,9 @@
+use colored::*;
+use magc::compiler::Compiler;
 use magc::lexer::Lexer;
 use magc::parser::Parser;
-use magc::types::{Expression, Token, ParserError};
-use magc::compiler::Compiler;
+use magc::types::{Expression, ParserError, Token};
 use strontium::Strontium;
-use colored::*;
 
 pub struct RuntimeConfig {
     pub debug: bool,
@@ -14,7 +14,7 @@ pub struct RuntimeConfig {
 pub struct Runtime {
     pub config: RuntimeConfig,
     /// Converts a source string into a linear sequence of tokens.
-    pub lexer:  Lexer,
+    pub lexer: Lexer,
     /// Assembles a sequence of tokens into a tree of expressions.
     pub parser: Parser,
     /// Compiles the AST into a sequence of instructions.
@@ -25,7 +25,7 @@ pub struct Runtime {
 impl Runtime {
     pub fn new(config: RuntimeConfig) -> Self {
         Self {
-            lexer:  Lexer::new(),
+            lexer: Lexer::new(),
             parser: Parser::new(),
             compiler: Compiler::new(),
             machine: Strontium::new(config.debug),
@@ -63,7 +63,7 @@ impl Runtime {
                     match compiled {
                         Ok(mut compiled) => {
                             bytecode.append(&mut compiled);
-                        },
+                        }
                         Err(e) => {
                             return Err(format!("{:?}", e));
                         }
@@ -71,10 +71,8 @@ impl Runtime {
                 }
 
                 Ok(bytecode)
-            },
-            Err(e) => {
-                Err(format!("{:?}", e))
             }
+            Err(e) => Err(format!("{:?}", e)),
         }
     }
 
@@ -90,7 +88,7 @@ impl Runtime {
                 }
 
                 self.machine.execute().unwrap();
-            },
+            }
             Err(e) => {
                 println!("{} {:?}", "error:".bright_red().bold(), e);
             }
