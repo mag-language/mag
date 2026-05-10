@@ -33,8 +33,10 @@ pub struct Repl {
 
 impl Repl {
     pub fn new(debug: bool) -> Self {
+        let mut runtime = Runtime::new(RuntimeConfig { debug });
+        runtime.compiler.context.repl_mode = true;
         Self {
-            runtime: Runtime::new(RuntimeConfig { debug }),
+            runtime,
             cancellation: CancellationToken::new(),
         }
     }
@@ -159,7 +161,8 @@ struct LineEditor {
     history: Vec<String>,
     history_path: Option<PathBuf>,
     theme: ReplTheme,
-    rendered_width: usize,
+    /// Row offset of the cursor below the prompt line after the last render.
+    rendered_cursor_row: usize,
     pending_events: VecDeque<Event>,
     ignore_next_submit: bool,
 }
@@ -170,7 +173,7 @@ impl LineEditor {
             history: vec![],
             history_path,
             theme,
-            rendered_width: 0,
+            rendered_cursor_row: 0,
             pending_events: VecDeque::new(),
             ignore_next_submit: false,
         }
@@ -378,21 +381,33 @@ impl LineEditor {
     }
 
     fn render<W: Write>(&mut self, stdout: &mut W, buffer: &InputBuffer) -> Result<()> {
+        let term_width = terminal::size().map(|(w, _)| w as usize).unwrap_or(80).max(1);
         let input = buffer.to_string();
-        let width = PROMPT_WIDTH + buffer.len();
-        let clear_width = self.rendered_width.max(width);
 
-        stdout
-            .queue(cursor::MoveToColumn(0))?
-            .queue(Print(" ".repeat(clear_width)))?
-            .queue(cursor::MoveToColumn(0))?
-            .queue(Print(self.theme.prompt(PROMPT)))?
-            .queue(Print(highlight_mag(&input, &self.theme)))?
-            .queue(cursor::MoveToColumn(
-                (PROMPT_WIDTH + buffer.cursor()).min(u16::MAX as usize) as u16,
-            ))?;
+        // Return to the start of the prompt line.
+        if self.rendered_cursor_row > 0 {
+            stdout.queue(cursor::MoveUp(self.rendered_cursor_row as u16))?;
+        }
+        stdout.queue(cursor::MoveToColumn(0))?;
+        stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
 
-        self.rendered_width = width;
+        // Print prompt + highlighted input.
+        stdout.queue(Print(self.theme.prompt(PROMPT)))?;
+        stdout.queue(Print(highlight_mag(&input, &self.theme)))?;
+
+        // After printing, cursor is at the end of the buffer. Compute row/col
+        // accounting for wrapping and move to the logical cursor position.
+        let cursor_abs = PROMPT_WIDTH + buffer.cursor();
+        let cursor_row = cursor_abs / term_width;
+        let cursor_col = cursor_abs % term_width;
+        let end_row = (PROMPT_WIDTH + buffer.len()) / term_width;
+
+        if end_row > cursor_row {
+            stdout.queue(cursor::MoveUp((end_row - cursor_row) as u16))?;
+        }
+        stdout.queue(cursor::MoveToColumn(cursor_col as u16))?;
+
+        self.rendered_cursor_row = cursor_row;
         stdout.flush()?;
         Ok(())
     }
