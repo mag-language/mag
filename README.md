@@ -1,60 +1,96 @@
 ![mag banner](https://world-of-music.at/downloads/bird-banner.png)
 
-# Introduction
+# Mag
 
-Mag is an optionally typed, object-oriented programming language with patterns, classes and multimethods.
+Mag is an optionally typed, expression-oriented programming language with multimethods and pattern matching.
 
-A simple example showing some code for a (very inefficent) recursive Fibonacci function can be defined like this using multimethods:
-
-```python
-def fib(0) 0
-def fib(1) 1
-def fib(n Int) fib(n - 2) + fib(n - 1)
-```
-
-This defines the same `fib` method multiple times, which is okay since the method signatures differ between the implementations, replacing the need for a separate conditional check inside the function.
-
-More documentation will follow in the future, and make sure to check out [Robert Nystrom's blog posts about Magpie](https://journal.stuffwithstuff.com/category/magpie/) for further information. His posts serve as the foundational inspiration for this project.
-
-# Features
-
-### Extensibility
-
-The parser and compiler structures use a modular, trait-based architecture with structs which handle the actual translation, which means that the actual interpretation of semantics is dynamic and may be extended by Mag code at runtime using [a special parselet](https://journal.stuffwithstuff.com/2011/02/13/extending-syntax-from-within-a-language/), a concept which could even be extended to compilation and execution to provide a very flexible programming environment.
-
-### Pattern Matching
-
-Patterns are not just used in Rust-like `match` expresions, they are actually dispersed throughout the whole language fabric of `mag` and `magc`, where it is used for method arguments, variable destructuring, error reporting and many other useful things.
-
-# Getting Started
-
-Enough fuzzy talk, let's start a REPL from the command line to get this project up and running.
-
-Run the following command from the project root to start the REPL:
+## Quick start
 
 ```
-cargo run
+cargo run          # start the REPL
+cargo run -- run <file.mag>   # run a source file
+cargo run -- --debug          # REPL with instruction/register output
 ```
 
-Try to enter simple arithmetic expressions like `1 + 2` or `3 * 7` to see the execution pipeline in action. Expect a lot of bugs for now!
+## Language overview
+
+### Arithmetic and comparisons
+
+```
+>>> 1 + 2
+3
+>>> 10 / 4
+2.5
+>>> 3 > 2
+true
+```
+
+### Multimethods
+
+Define the same method name multiple times with different signatures. The runtime picks the right one based on the argument:
+
+```
+>>> def fib(0) 0
+>>> def fib(1) 1
+>>> def fib(n Int) fib(n - 1) + fib(n - 2)
+>>> fib(10)
+55
+```
+
+### Type-based dispatch
+
+Type annotations on parameters create distinct dispatch entries:
+
+```
+>>> def double(n Int) n * 2
+>>> def double(n String) n + n
+>>> double(5)
+10
+>>> double("hi")
+hihi
+```
+
+### Conditionals
+
+```
+>>> if 3 > 2 then print("yes") else print("no") end
+yes
+```
+
+### Variables
+
+```
+>>> var x = 42
+>>> x
+42
+```
+
+Inside a method body, `var` binds a local variable:
+
+```
+>>> def greet(name String)
+...   var msg = "hello " + name
+...   msg
+... end
+>>> greet("world")
+hello world
+```
+
+### Early return
+
+```
+>>> def abs(n Int)
+...   if n < 0 then return 0 - n end
+...   n
+... end
+>>> abs(-5)
+5
+```
 
 ## Credits
 
-Mag is based on the Magpie language by [Robert Nystrom](http://stuffwithstuff.com/), who is a language engineer at Google with [a blog and a lot of amazing ideas](http://journal.stuffwithstuff.com/category/magpie/). His various blog posts are what started and inspired this project, and I plan on continuing his legacy even if the original codebase ceases further development.
+Mag is based on the Magpie language by [Robert Nystrom](http://stuffwithstuff.com/). His [blog posts](http://journal.stuffwithstuff.com/category/magpie/) are the foundational inspiration for this project.
 
-However, since there are a few syntactical differences to the original Magpie language, the two languages are *source-incompatible* and thus have different names. In particular, Bob's implementation substitutes the dot commonly used for calling methods on objects with a space (usually a meaningless character), which I find rather unintuitive, especially for new programmers.
+# License
 
-<!--
-# Roadmap
-
-
-- [x] REPL
-  - [x] Basic interface for entering commands
-  - [ ] Cursor Movement
-  - [ ] Syntax Highlighting with `syntect`
-  - [ ] Error Reporting
-    - [x] Simple error handling
-    - [ ] Complex error messages with source code and help
-  - [ ] Multi-Line Input
--->
-
+Licensed under the MIT license.
