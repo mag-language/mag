@@ -78,22 +78,6 @@ fn run_source(source: String, debug: bool) {
                 );
             }
 
-            // Register all compiled methods in the VM's dispatch table
-            for reg in &runtime.compiler.method_registrations {
-                runtime.machine.register_method(
-                    reg.method_name.clone(),
-                    reg.pattern.clone(),
-                    reg.address,
-                );
-
-                if debug {
-                    println!(
-                        "Registered method {} with pattern {:?} at address {}",
-                        reg.method_name, reg.pattern, reg.address
-                    );
-                }
-            }
-
             for instruction in instructions.clone() {
                 runtime.machine.push_instruction(instruction);
             }

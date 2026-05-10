@@ -87,14 +87,6 @@ impl Repl {
                 }
 
                 self.runtime.machine.reset();
-                self.runtime.machine.multimethod_table.clear();
-                for reg in &self.runtime.compiler.method_registrations {
-                    self.runtime.machine.register_method(
-                        reg.method_name.clone(),
-                        reg.pattern.clone(),
-                        reg.address,
-                    );
-                }
 
                 for instruction in instructions.clone() {
                     self.runtime.machine.push_instruction(instruction);
@@ -652,7 +644,7 @@ fn highlight_mag(input: &str, theme: &ReplTheme) -> String {
         } else if "()[]{}.,:".contains(ch) {
             highlighted.push_str(&theme.punctuation(&ch.to_string()));
             index += 1;
-        } else if "+-*/%=!<>^".contains(ch) {
+        } else if "+-*/%=!<>^~".contains(ch) {
             highlighted.push_str(&theme.operator(&ch.to_string()));
             index += 1;
         } else {
