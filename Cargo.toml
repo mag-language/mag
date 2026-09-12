@@ -7,6 +7,7 @@ categories = ["compilers", "development-tools", "parser-implementations"]
 license = "MIT"
 version = "0.9.0"
 edition = "2021"
+exclude = ["scripts/*.md", "test.mag"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
