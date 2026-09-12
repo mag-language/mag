@@ -43,7 +43,7 @@ impl Repl {
 
     pub fn launch(&mut self) -> Result<()> {
         println!("");
-        println!("{}", std::fs::read_to_string("./logo.txt")?);
+        println!("{}", std::fs::read_to_string("./bird.txt")?);
         flag::register(SIGINT, self.cancellation.flag())?;
 
         let mut editor = LineEditor::new(Self::history_path(), ReplTheme::from_env());
