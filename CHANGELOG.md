@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - September 13, 2026
+
+### Added
+
+- Everything new in `magc` 0.9.0 is available in the REPL and when running files: `match` expressions, records, `nothing`, multi-line definitions, unary minus, and `~` concatenation.
+- One-liner `match` expressions no longer need `end`, e.g. `match 3 case 7 then 1`.
+- The REPL echoes the result of every expression, including `if`, `match`, literals, and `nothing`. `def`, `var`, and `print` stay silent.
+- Example scripts in `scripts/` demonstrating multimethod dispatch, named record fields, and `match`.
+
+### Changed
+
+- The REPL and file runner no longer manage a runtime dispatch table; dispatch is resolved at compile time.
+- The REPL greets you with an ASCII magpie instead of the text logo.
+
+### Fixed
+
+- Multimethod variants that differ only in a literal value (e.g. `fib(0)` and `fib(1)`) can be defined on separate REPL lines.
+- Calling a multimethod with an unsupported argument now shows an error instead of silently stopping.
+- `print(nothing)` prints `nothing` instead of producing no output.
+
 ## [0.8.0] - May 10, 2026
 
 ### Added
