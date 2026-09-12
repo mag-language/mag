@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multimethod variants that differ only in a literal value (e.g. `fib(0)` and `fib(1)`) can be defined on separate REPL lines.
 - Calling a multimethod with an unsupported argument now shows an error instead of silently stopping.
 - `print(nothing)` prints `nothing` instead of producing no output.
+- The REPL no longer fails to start when launched outside the project directory, e.g. after `cargo install mag_lang`; the startup banner is now embedded in the binary.
 
 ## [0.8.0] - May 10, 2026
 

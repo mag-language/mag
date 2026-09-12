@@ -43,7 +43,8 @@ impl Repl {
 
     pub fn launch(&mut self) -> Result<()> {
         println!("");
-        println!("{}", std::fs::read_to_string("./bird.txt")?);
+        // Embedded at compile time so the banner works wherever the REPL is launched.
+        println!("{}", include_str!("../../bird.txt"));
         flag::register(SIGINT, self.cancellation.flag())?;
 
         let mut editor = LineEditor::new(Self::history_path(), ReplTheme::from_env());
