@@ -1,0 +1,7 @@
+print(match name: "Dan", pals: ("Sam", "Ed")
+  case name: "Dave" then "don't care about Dave's friends"
+  case name: a, pals: nothing then a ~ " has no friends"
+  case name: n, pals: (a, b) then
+      n ~ " is pals with " ~ a ~ " and " ~ b
+  end
+end)
