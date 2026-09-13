@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - September 13, 2026
+
+### Changed
+
+- Value patterns in method signatures must be literals, including negative numbers; expression patterns like `def f(1 + 2)` are a compile error.
+- Parentheses containing only record fields, like `p: (x: 1)`, are nested records.
+
+### Fixed
+
+- `match` arms now correctly compare strings, booleans, `nothing`, value expressions like `1 + 2`, typed record fields, nested records and tuples. Previously such arms matched any value, and tuple subjects failed to compile.
+- Multimethod variants with equal precedence are tried in definition order instead of an arbitrary order.
+
 ## [0.9.0] - September 13, 2026
 
 ### Added
